@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edible Gift Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --coral: #e85d5d;
+            --coral-light: #ff7b7b;
+            --coral-bg: #fff5f5;
+            --green: #2d8a5e;
+            --green-light: #e8f5ee;
+            --cream: #fdfbf7;
+            --gray-100: #f7f7f7;
+            --gray-200: #e8e8e8;
+            --gray-600: #5a5a5a;
+            --gray-800: #2d2d2d;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            background: var(--cream);
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+        .banner {
+            display: flex;
+            justify-content: flex-start;
+            padding: 1rem 0;
+            margin-bottom: 0.5rem;
+        }
+        .logo-link {
+            display: block;
+            line-height: 0;
+        }
+        .logo {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 0.35rem 0;
+            color: var(--gray-800);
+        }
+        .caption {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        .chat-wrapper {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 560px;
+            max-height: 80vh;
+        }
+        #chat {
+            flex: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            min-height: 380px;
+        }
+        .msg { margin-bottom: 1.25rem; }
+        .msg.user { text-align: right; }
+        .msg.user .bubble {
+            background: var(--coral-bg);
+            color: var(--gray-800);
+            margin-left: auto;
+            border: 1px solid rgba(232,93,93,0.2);
+        }
+        .msg.assistant .bubble {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+        .bubble {
+            display: inline-block;
+            max-width: 88%;
+            padding: 0.85rem 1.15rem;
+            border-radius: var(--radius-lg);
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        .bubble p { margin: 0 0 0.5rem 0; }
+        .bubble p:last-child { margin-bottom: 0; }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: stretch;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            overflow: hidden;
+            padding: 0;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+            background: var(--gray-100);
+        }
+        .card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0.85rem;
+            min-height: 0;
+        }
+        .card h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0 0 0.35rem 0;
+            color: var(--gray-800);
+            line-height: 1.3;
+        }
+        .card .price {
+            color: var(--green);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .card .rec {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            margin: 0.5rem 0;
+            line-height: 1.4;
+        }
+        .card a,
+        .card .product-action {
+            display: inline-block;
+            margin-top: auto;
+            padding: 0.4rem 0.8rem;
+            background: var(--coral);
+            color: #fff !important;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .card a:hover,
+        .card .product-action:hover { background: var(--coral-light); }
+        .input-area {
+            padding: 1rem 1.25rem;
+            background: #fff;
+            border-top: 1px solid var(--gray-200);
+        }
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.85rem;
+        }
+        .chip {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--gray-600);
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .chip:hover {
+            background: var(--coral-bg);
+            color: var(--coral);
+        }
+        #form { display: flex; gap: 0.6rem; }
+        #input {
+            flex: 1;
+            padding: 0.75rem 1.15rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 24px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--gray-100);
+        }
+        #input:focus {
+            outline: none;
+            border-color: var(--coral);
+            background: #fff;
+        }
+        #input::placeholder { color: var(--gray-600); opacity: 0.8; }
+        #submit {
+            padding: 0.75rem 1.35rem;
+            background: var(--coral);
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        #submit:hover { background: var(--coral-light); }
+        #submit:disabled { opacity: 0.6; cursor: not-allowed; }
+        .clear { margin-bottom: 1rem; }
+        .clear a {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+        .clear a:hover { color: var(--coral); }
+        .error { color: var(--coral); padding: 0.5rem; }
+        .loading { color: var(--gray-600); }
+        .typing-dots span {
+            animation: typing-dot 1.4s ease-in-out infinite;
+            opacity: 0;
+        }
+        .typing-dots span:nth-child(1) { animation-delay: 0s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-dot {
+            0%, 60%, 100% { opacity: 0; }
+            30% { opacity: 1; }
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--gray-200);
+            text-align: left;
+        }
+        .comparison-table th {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        .comparison-table tr:nth-child(even) td { background: #fafafa; }
+        .comparison-table .attr-col { font-weight: 500; color: var(--gray-600); width: 25%; }
+        .debug-raw {
+            font-family: monospace;
+            font-size: 0.75rem;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            max-height: 200px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .debug-label { font-size: 0.7rem; color: var(--gray-600); margin-bottom: 0.25rem; }
+        .shelf {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .shelf-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <a href="https://www.ediblearrangements.com" target="_blank" rel="noopener" class="logo-link">
+            <img src="{{ url_for('static', filename='edible-logo.webp') }}" alt="Edible Arrangements" class="logo">
+        </a>
+    </div>
+    <header class="header">
+        <h1>Edible Gift Finder</h1>
+        <p class="caption">Tell me what you're looking for, occasion, who it's for, or your budget, and I'll help you find the perfect gift.</p>
+    </header>
+
+    <div class="clear">
+        <a href="#" id="clear">Clear chat</a>
+        <label style="margin-left: 1rem; font-size: 0.875rem; color: var(--gray-600);">
+            <input type="checkbox" id="debug-toggle"> Show LLM debug
+        </label>
+    </div>
+
+    <div class="chat-wrapper">
+        <div id="chat">
+            <div id="shelf" class="shelf">
+                <div class="shelf-label">Popular picks to get you started</div>
+                <div id="shelf-products" class="products"></div>
+            </div>
+        </div>
+        <div class="input-area">
+            <div class="chips" id="chips">
+                <button type="button" class="chip" data-msg="Mother's Day gift under $50">Mother's Day gift under $50</button>
+                <button type="button" class="chip" data-msg="chocolate covered strawberries">Chocolate strawberries</button>
+                <button type="button" class="chip" data-msg="fruit bouquet for mom">Fruit bouquet for mom</button>
+            </div>
+            <form id="form">
+                <input type="text" id="input" placeholder="What gift are you looking for?" autocomplete="off" title="After seeing recommendations, try 'cheaper', 'more fun', or 'something different' to refine">
+                <button type="submit" id="submit">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const submit = document.getElementById('submit');
+
+        let history = [];
+
+        function renderProductCard(p) {
+            const price = typeof p.price === 'number' ? `$${p.price.toFixed(2)}` : (p.price || 'N/A');
+            return `<div class="card">
+                ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="">` : ''}
+                <div class="card-body">
+                    <h3>${escapeHtml(p.name || 'Unknown')}</h3>
+                    <div class="price">${escapeHtml(String(price))}</div>
+                    ${p.url ? `<button type="button" class="product-action" data-state="view" data-url="${escapeHtml(p.url)}">View on site</button>` : ''}
+                </div>
+            </div>`;
+        }
+
+        function escapeHtml(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+        function renderMessage(role, content, products = [], comparisonTable = null, debugRaw = null) {
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            let html = '';
+            if (debugRaw) {
+                html += '<div class="debug-label">Raw LLM response (debug):</div>';
+                html += '<div class="debug-raw">' + escapeHtml(debugRaw) + '</div>';
+            }
+            const safe = escapeHtml(content).replace(/\n/g, '<br>');
+            html += `<div class="bubble"><p>${safe}</p>`;
+            if (comparisonTable && comparisonTable.length) {
+                const prodList = products || [];
+                const numCols = Math.max(prodList.length, ...comparisonTable.map(r => (r.values || []).length), 1);
+                html += '<table class="comparison-table"><thead><tr><th class="attr-col">Attribute</th>';
+                for (let i = 0; i < numCols; i++) {
+                    html += `<th>${escapeHtml(prodList[i]?.name || 'Product ' + (i + 1))}</th>`;
+                }
+                html += '</tr></thead><tbody>';
+                comparisonTable.forEach(row => {
+                    html += `<tr><td class="attr-col">${escapeHtml(row.attribute || '')}</td>`;
+                    (row.values || []).forEach(v => {
+                        html += `<td>${escapeHtml(String(v))}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+            }
+            if (products && products.length) {
+                html += '<div class="products">';
+                products.slice(0, 6).forEach(p => {
+                    const price = typeof p.price === 'number' ? `$${p.price.toFixed(2)}` : (p.price || 'N/A');
+                    html += `<div class="card">
+                        ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="">` : ''}
+                        <div class="card-body">
+                            <h3>${escapeHtml(p.name || 'Unknown')}</h3>
+                            <div class="price">${escapeHtml(String(price))}</div>
+                            ${p.recommendation ? `<div class="rec">${escapeHtml(p.recommendation)}</div>` : ''}
+                            ${p.url ? `<button type="button" class="product-action" data-state="view" data-url="${escapeHtml(p.url)}">View on site</button>` : ''}
+                        </div>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+            div.innerHTML = html;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function send() {
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            input.value = '';
+            submit.disabled = true;
+
+            renderMessage('user', msg);
+            history.push({ role: 'user', content: msg });
+
+            const loading = document.createElement('div');
+            loading.className = 'msg assistant';
+            loading.innerHTML = '<div class="bubble loading">Typing<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+            chat.appendChild(loading);
+            chat.scrollTop = chat.scrollHeight;
+
+            // If last assistant message had products, send them for refinement feedback
+            const lastWithProducts = [...history].reverse().find(m => m.role === 'assistant' && m.products?.length);
+            const lastUserBeforeRecs = lastWithProducts
+                ? history[history.indexOf(lastWithProducts) - 1]?.content
+                : null;
+            const payload = {
+                message: msg,
+                history: history.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
+                debug: document.getElementById('debug-toggle').checked
+            };
+            if (lastWithProducts?.products?.length && lastUserBeforeRecs) {
+                payload.last_products = lastWithProducts.products;
+                payload.last_search_query = lastUserBeforeRecs;
+            }
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                loading.remove();
+
+                if (!res.ok) {
+                    renderMessage('assistant', data.error || 'Something went wrong.');
+                    return;
+                }
+
+                renderMessage('assistant', data.message, data.products || [], data.comparison_table || null, data.debug_llm_response || null);
+                history.push({
+                    role: 'assistant',
+                    content: data.message,
+                    products: data.products || []
+                });
+                input.placeholder = (data.products?.length && !data.comparison_table)
+                    ? "Try 'cheaper' or 'more fun' to refine"
+                    : "What gift are you looking for?";
+            } catch (err) {
+                loading.remove();
+                renderMessage('assistant', 'Network error. Please try again.');
+            }
+            submit.disabled = false;
+            if (history.length > 0) {
+                document.getElementById('chips').style.display = 'none';
+            }
+        }
+
+        (async function loadShelf() {
+            try {
+                const res = await fetch('/api/popular');
+                const data = await res.json();
+                const products = data.products || [];
+                const shelf = document.getElementById('shelf-products');
+                shelf.innerHTML = products.map(p => renderProductCard(p)).join('');
+            } catch (err) {
+                document.getElementById('shelf-products').innerHTML = '';
+            }
+        })();
+
+        chat.addEventListener('click', (e) => {
+            const btn = e.target.closest('.product-action');
+            if (!btn) return;
+            const url = btn.dataset.url;
+            const state = btn.dataset.state;
+            if (url) window.open(url, '_blank');
+            if (state === 'view') {
+                btn.textContent = 'Purchase this';
+                btn.dataset.state = 'purchase';
+            } else if (state === 'purchase') {
+                const congrats = 'Congratulations for finding the item you want!';
+                renderMessage('assistant', congrats);
+                renderMessage('assistant', 'Thank you for using the chat service!');
+                history.push({ role: 'assistant', content: congrats, products: [] });
+            }
+        });
+        form.addEventListener('submit', (e) => { e.preventDefault(); send(); });
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                input.value = chip.dataset.msg;
+                send();
+            });
+        });
+        document.getElementById('clear').addEventListener('click', (e) => {
+            e.preventDefault();
+            const shelf = document.getElementById('shelf');
+            shelf.remove();
+            chat.innerHTML = '';
+            chat.appendChild(shelf);
+            history = [];
+            input.placeholder = "What gift are you looking for?";
+            document.getElementById('chips').style.display = '';
+        });
+    </script>
+</body>
+</html>
